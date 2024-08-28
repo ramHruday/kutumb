@@ -1,0 +1,31 @@
+.folder-browser {
+  padding: 20px 20px 0 20px;
+}
+
+.breadcrumbs span {
+  cursor: pointer;
+  color: #007bff;
+  margin-right: 5px;
+}
+
+.breadcrumbs span:hover {
+  text-decoration: underline;
+}
+
+.folder-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.folder-item {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+}
+
+.folder-icon {
+  margin-right: 8px;
+  color: #f0ad4e;
+}

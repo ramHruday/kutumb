@@ -1,0 +1,67 @@
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+}
+
+.root {
+  overflow: hidden;
+}
+
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+
+/* Works on Firefox */
+.thin-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: beige;
+}
+
+/* Works on Chrome, Edge, and Safari */
+.thin-scroll::-webkit-scrollbar {
+  width: 6px;
+}
+
+.thin-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thin-scroll::-webkit-scrollbar-thumb {
+  background-color: beige;
+  border-radius: 5px;
+}
+
+.images-gallery {
+  height: 70vh;             /* Set height of the gallery */
+  overflow-y: auto;      /* Add padding around the gallery */
+  border-radius: 8px;      /* Rounded corners for a smoother look */
+}
+
+.images-gallery h3 {
+  margin-bottom: 20px;      /* Space between title and gallery */
+  color: #343a40;           /* Darker color for better readability */
+  text-align: center;       /* Center align the title */
+}
+
+.image-item {
+    background-size: cover; /* Ensures the image covers the div */
+    background-position: center; /* Centers the image */
+    height: 200px; /* Fixed height for uniformity */
+    width: 100%; /* Full width of the container */
+    border-radius: 8px; /* Optional: for aesthetics */
+    margin-bottom: 10px; /* Spacing between items */
+    display: flex; /* Flexbox for centering content */
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+    color: white; /* Text color for any overlay text */
+    position: relative; /* Position for potential overlays */
+}
+
+
