@@ -1,0 +1,28 @@
+.dashboard-container {
+    display: flex;
+    height: 100vh; /* Full height */
+}
+
+.side-panel {
+    width: 200px; /* Width of the side panel */
+    padding: 20px;
+    overflow-y: auto; /* Scroll if content exceeds height */
+}
+
+.main-content {
+    flex: 1; /* Fill the remaining space */
+    padding: 20px; /* Padding for the main content */
+}
+
+.upload-button {
+    margin-top: 20px; /* Space above the button */
+}
+
+/* Additional styles for folder and image rows */
+.folder-row, .image-row {
+    margin-top: 20px;
+}
+
+.folder-item {
+    cursor: pointer; /* Indicate that folders are clickable */
+}

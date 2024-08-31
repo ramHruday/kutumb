@@ -73,7 +73,7 @@ export const UserContextProvider = ({ children, app: mongoRealm }) => {
   }, []);
 
   if (loading) {
-    return <Spinner variant="border" size="sm"></Spinner>;
+    return <Spinner className="text-white" variant="border" size="sm"></Spinner>;
   }
 
   return (

@@ -1,16 +1,10 @@
 import React, { useState } from "react";
-import { Button, Form } from "react-bootstrap";
+import { Button, Form, Modal } from "react-bootstrap";
 import { S3 } from "aws-sdk";
 
-const FileUploader = ({ onUploadComplete, currentFolderPath }) => {
+const FileUploader = ({ s3, onUploadComplete, currentFolderPath, show, onHide }) => {
     const [files, setFiles] = useState(null);
     const [error, setError] = useState("");
-
-    const s3 = new S3({
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
-        secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
-        region: process.env.REACT_APP_REGION,
-    });
 
     const handleFileChange = (event) => {
         const selectedFiles = event.target.files;
@@ -19,8 +13,8 @@ const FileUploader = ({ onUploadComplete, currentFolderPath }) => {
             return isImage;
         });
 
-        if (validFiles.length > 10) {
-            setError("You can upload a maximum of 10 images.");
+        if (validFiles.length > 5) { // Change to 5
+            setError("You can upload a maximum of 5 images.");
             setFiles(null);
         } else {
             setError("");
@@ -48,6 +42,7 @@ const FileUploader = ({ onUploadComplete, currentFolderPath }) => {
             if (onUploadComplete) {
                 onUploadComplete(); // Notify parent component to refresh images
             }
+            onHide(); // Close modal after upload
         } catch (error) {
             console.error("Error uploading files:", error);
             alert("Failed to upload files.");
@@ -55,21 +50,32 @@ const FileUploader = ({ onUploadComplete, currentFolderPath }) => {
     };
 
     return (
-        <div>
-            <Form.Group>
-                <Form.Control
-                    type="file"
-                    multiple
-                    label="Choose images to upload"
-                    onChange={handleFileChange}
-                    aria-label="Choose images to upload"
-                />
-                {error && <p className="text-danger">{error}</p>}
-            </Form.Group>
-            <Button variant="primary" onClick={handleUpload}>
-                Upload
-            </Button>
-        </div>
+        <Modal show={show} onHide={onHide}>
+            <Modal.Header closeButton>
+                <Modal.Title>Upload Files to</Modal.Title>
+            </Modal.Header>
+            <Modal.Body>
+            <b>{currentFolderPath}</b>
+                <Form.Group>
+                    <Form.Control
+                        type="file"
+                        multiple
+                        label="Choose images to upload"
+                        onChange={handleFileChange}
+                        aria-label="Choose images to upload"
+                    />
+                    {error && <p className="text-danger">{error}</p>}
+                </Form.Group>
+            </Modal.Body>
+            <Modal.Footer>
+                <Button variant="secondary" onClick={onHide}>
+                    Close
+                </Button>
+                <Button variant="primary" onClick={handleUpload}>
+                    Upload
+                </Button>
+            </Modal.Footer>
+        </Modal>
     );
 };
 

@@ -1,30 +1,26 @@
 import React, { useState, useEffect } from "react";
-import { Spinner, Row, Col, Container } from "react-bootstrap";
-import { S3 } from "aws-sdk";
-import FolderBrowser from "./FolderBrowser"; 
-import FileUploader from "./FileUploader"; // Import the FileUploader component
-import { FaFolder } from "react-icons/fa"; 
+import { Spinner, Row, Col, Container, Button } from "react-bootstrap";
+import FolderBrowser from "./FolderBrowser";
+import FileUploader from "./FileUploader";
+import { FaFolder } from "react-icons/fa";
+import './Dashboard.css'; // Make sure to create a CSS file for additional styles
 
 const S3Item = React.lazy(() => import("./s3-image"));
 
-function Dashboard() {
+function Dashboard({ s3 }) {
     const [images, setImages] = useState([]);
     const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(false);
     const [folderPath, setFolderPath] = useState("");
-
-    const s3 = new S3({
-        accessKeyId: process.env.REACT_APP_ACCESS_KEY_ID,
-        secretAccessKey: process.env.REACT_APP_SECRET_ACCESS_KEY,
-        region: process.env.REACT_APP_REGION,
-    });
+    const [error, setError] = useState("");
 
     useEffect(() => {
         fetchContents(folderPath);
-    }, [folderPath]);
+    }, [s3, folderPath]);
 
     const fetchContents = async (path) => {
         setLoading(true);
+        setError(""); // Reset error state
         try {
             const params = {
                 Bucket: process.env.REACT_APP_BUCKET_NAME,
@@ -65,6 +61,7 @@ function Dashboard() {
             setImages(fetchedImages);
         } catch (error) {
             console.error("Error fetching contents:", error.message);
+            setError("Failed to load contents. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -72,46 +69,60 @@ function Dashboard() {
 
     const handleFolderClick = (path) => {
         setFolderPath(path);
-        setImages([]); 
-        setFolders([]); 
+        setImages([]);
+        setFolders([]);
     };
 
     const handleUploadComplete = () => {
-        fetchContents(folderPath); // Refresh images after upload
+        fetchContents(folderPath);
     };
 
+    const [showUploader, setShowUploader] = useState(false);
+
     return (
-        <Container>
-            <FolderBrowser
-                initialFolders={folderPath}
-                onFolderPathChange={handleFolderClick}
-            />
-
-            <div className="images-gallery p-5 thin-scroll">
-                {loading && <Spinner animation="border" />}
-                {folders.length === 0 && images.length === 0 && !loading && <p className="text-white">Empty</p>}
-                
-                <Row className="folder-row">
-                    {folders.map((folder) => (
-                        <Col key={folder.path} sm={2} className="folder-col" onClick={() => handleFolderClick(folder.path)}>
-                            <div className="folder-item d-block" style={{ textAlign: "center", width: "150px", margin: "10px auto" }}>
-                                <FaFolder className="folder-icon" style={{ fontSize: "150px" }} />
-                                <p className="text-white">{folder.name}</p>
-                            </div>
-                        </Col>
-                    ))}
-                </Row>
-
-                <Row className="image-row">
-                    {images.map((image) => (
-                        <Col key={image.key} sm={2} className="image-col">
-                            <S3Item imageUrl={image.url} />
-                        </Col>
-                    ))}
-                </Row>
+        <Container fluid className="dashboard-container">
+            <div className="side-panel">
+                <Button variant="primary" onClick={() => setShowUploader(true)} className="upload-button">
+                    Upload Files
+                </Button>
             </div>
-            <FileUploader onUploadComplete={handleUploadComplete} currentFolderPath={folderPath} />
+            <div className="main-content">
+                <FolderBrowser
+                    initialFolders={folderPath}
+                    onFolderPathChange={handleFolderClick}
+                />
+                <div className="images-gallery p-5 thin-scroll">
+                    {loading && <Spinner animation="border" />}
+                    {error && <p className="text-danger">{error}</p>}
+                    {folders.length === 0 && images.length === 0 && !loading && <p className="text-white">Empty</p>}
 
+                    <Row className="folder-row">
+                        {folders.map((folder) => (
+                            <Col key={folder.path} sm={2} className="folder-col" onClick={() => handleFolderClick(folder.path)}>
+                                <div className="folder-item d-block" style={{ textAlign: "center", width: "150px", margin: "10px auto" }}>
+                                    <FaFolder className="folder-icon" style={{ fontSize: "150px" }} />
+                                    <p className="text-white">{folder.name}</p>
+                                </div>
+                            </Col>
+                        ))}
+                    </Row>
+
+                    <Row className="image-row">
+                        {images.map((image) => (
+                            <Col key={image.key} sm={2} className="image-col">
+                                <S3Item imageUrl={image.url} />
+                            </Col>
+                        ))}
+                    </Row>
+                </div>
+            </div>
+            <FileUploader
+                s3={s3}
+                onUploadComplete={handleUploadComplete}
+                currentFolderPath={folderPath}
+                show={showUploader}
+                onHide={() => setShowUploader(false)}
+            />
         </Container>
     );
 }
