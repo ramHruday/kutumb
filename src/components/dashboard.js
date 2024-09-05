@@ -7,16 +7,13 @@ import './Dashboard.css'; // Make sure to create a CSS file for additional style
 
 const S3Item = React.lazy(() => import("./s3-image"));
 
-function Dashboard({ s3 }) {
+function Dashboard({ s3, base_path }) {
     const [images, setImages] = useState([]);
     const [folders, setFolders] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [folderPath, setFolderPath] = useState("");
+    const [folderPath, setFolderPath] = useState(base_path);
     const [error, setError] = useState("");
 
-    useEffect(() => {
-        fetchContents(folderPath);
-    }, [s3, folderPath]);
 
     const fetchContents = async (path) => {
         setLoading(true);
@@ -24,7 +21,7 @@ function Dashboard({ s3 }) {
         try {
             const params = {
                 Bucket: process.env.REACT_APP_BUCKET_NAME,
-                Prefix: path,
+                Prefix: path ?? base_path,
                 Delimiter: "/",
             };
 
@@ -36,26 +33,13 @@ function Dashboard({ s3 }) {
                 path: prefix.Prefix,
             }));
 
-            const fetchedImages = await Promise.all(
-                data.Contents
-                    .filter((item) => {
-                        const isTopLevel = item.Key === path || !item.Key.replace(path, "").includes("/");
-                        const extension = item.Key.split(".").pop().toLowerCase();
-                        return isTopLevel && imageExtensions.includes(`.${extension}`);
-                    })
-                    .map(async (item) => {
-                        const signedUrl = await s3.getSignedUrlPromise("getObject", {
-                            Bucket: params.Bucket,
-                            Key: item.Key,
-                            Expires: 60 * 60,
-                        });
+            const fetchedImages = data.Contents
+                .filter((item) => {
+                    const isTopLevel = item.Key === path || !item.Key.replace(path, "").includes("/");
+                    const extension = item.Key.split(".").pop().toLowerCase();
+                    return isTopLevel && imageExtensions.includes(`.${extension}`);
+                })
 
-                        return {
-                            url: signedUrl,
-                            key: item.Key,
-                        };
-                    })
-            );
 
             setFolders(fetchedFolders);
             setImages(fetchedImages);
@@ -77,6 +61,12 @@ function Dashboard({ s3 }) {
         fetchContents(folderPath);
     };
 
+
+    useEffect(() => {
+        fetchContents(folderPath);
+
+    }, [s3, folderPath]);
+
     const [showUploader, setShowUploader] = useState(false);
 
     return (
@@ -87,10 +77,10 @@ function Dashboard({ s3 }) {
                 </Button>
             </div>
             <div className="main-content">
-                <FolderBrowser
+                {/* <FolderBrowser
                     initialFolders={folderPath}
                     onFolderPathChange={handleFolderClick}
-                />
+                /> */}
                 <div className="images-gallery p-5 thin-scroll">
                     {loading && <Spinner animation="border" />}
                     {error && <p className="text-danger">{error}</p>}
@@ -110,7 +100,7 @@ function Dashboard({ s3 }) {
                     <Row className="image-row">
                         {images.map((image) => (
                             <Col key={image.key} sm={2} className="image-col">
-                                <S3Item imageUrl={image.url} />
+                                <S3Item image={image} s3={s3} bucket={process.env.REACT_APP_BUCKET_NAME} />
                             </Col>
                         ))}
                     </Row>

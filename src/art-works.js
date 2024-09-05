@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import { Col, Row, Spinner } from "react-bootstrap";
+import { Row, Spinner } from "react-bootstrap";
 import { S3 } from "aws-sdk"; // Import S3
 import { MongoContext } from "./context/mongo-context";
 import LoginForm from "./components/login-form";
@@ -55,7 +55,7 @@ function ArtWorks(props) {
 
     return userData ? (
         <Row>
-            <Dashboard s3={s3} /> {/* Pass the S3 instance to Dashboard */}
+            <Dashboard s3={s3} base_path={'balaji/low_res/'}/> {/* Pass the S3 instance to Dashboard */}
         </Row>
     ) : (
         <LoginForm

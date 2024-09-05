@@ -10,20 +10,6 @@
   max-width: 300px;
 }
 
-.art-works {
-  height: calc(100vh - 81px);
-}
-
-.color-box {
-  width: 20px;
-  height: 20px;
-}
-
-.figure-caption {
-  font-size: 0.75rem !important;
-  max-width: 100%;
-}
-
 
 .shimmer {
   position: absolute;
